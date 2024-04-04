@@ -5,11 +5,23 @@ $title="Recettes";
 
 $mysqlclient=new PDO("mysql:host=localhost;dbname=recette","root","");
 
-$query=$mysqlclient->query("SELECT recette.id_recette,nom_recette, instructions, temps_preparation, ingredients.nom_ingredient, ingredient_recette.quantite, categorie.nom_categorie
+$query=$mysqlclient->query("SELECT DISTINCT recette.id_recette,  nom_recette, instructions, temps_preparation,categorie.nom_categorie,
+                            -- GROUP_CONTACT pour concatener les ingredients + qunatite et 'g' sur une meme ligne avec un separateur ','
+                            GROUP_CONCAT(CONCAT(ingredients.nom_ingredient, ' ', ingredient_recette.quantite, ' ', 'g') SEPARATOR ', ') AS liste_ingredient  
                             FROM recette
-                            INNER JOIN ingredient_recette ON ingredient_recette.id_recette = recette.id_recette
-                            INNER JOIN ingredients ON ingredients.id_ingredient = ingredient_recette.id_ingredient
-                            INNER JOIN categorie ON recette.id_categorie = categorie.id_categorie
+                            LEFT JOIN ingredient_recette ON ingredient_recette.id_recette = recette.id_recette
+                            LEFT JOIN ingredients ON ingredients.id_ingredient = ingredient_recette.id_ingredient
+                            LEFT JOIN categorie ON recette.id_categorie = categorie.id_categorie
+                            GROUP BY 
+                            recette.id_recette, 
+                            nom_recette, 
+                            instructions, 
+                            temps_preparation, 
+                            categorie.nom_categorie
+                            ORDER BY 
+                            nom_recette;
+
+
                             ");
 $query->execute();
 $recette=$query->fetchAll();
@@ -30,12 +42,12 @@ $recette=$query->fetchAll();
 
     <?php foreach($recette as $recettes):?>
         <section id="<?php echo $recettes['id_recette'];?>">
-            <header><?php echo $recettes['nom_recette'];?></header>
+            <header class="titreRecette"><?php echo $recettes['nom_recette'];?></header>
             
             <p><?php echo $recettes['instructions'];?></p>
             <p>Temps de préparation : <?php echo $recettes['temps_preparation'];?> minutes</p>
             <p>Catégorie : <?php echo $recettes['nom_categorie'];?></p>
-            <p>Ingredients: <?php echo $recette['ingredients.nom_ingredient']?> * <?php echo $recette['ingredient_recette.quantite']?>  </p>
+            <p>Ingredients: <?php echo $recettes['liste_ingredient']?></p>
             <?php endforeach ?>                 
         </section>
 
@@ -77,9 +89,19 @@ a:hover{
     margin-bottom: 110px;
 }
 
-header{
+.titreRecette{
     text-align: start;
+    font-size: x-large;
+    margin:5px;
+    padding-bottom: 20px;
+    width: 100%;
+    height: 0px;
+    
 }
+nav{
+    margin-left: 320px;
+}
+
 
 </style>
 

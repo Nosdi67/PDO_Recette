@@ -39,6 +39,8 @@
     nav{
         display: flex;
         justify-content: space-around;
+        
+        
     }
     ul{
         display: flex;

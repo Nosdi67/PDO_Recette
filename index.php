@@ -22,7 +22,7 @@ $recette=$query->fetchAll();
             </tr>
             <?php foreach($recette as $recettes):?>
                 <tr>
-                    <td><a href=""><?php echo $recettes['nom_recette'];?></a></td>
+                    <td><a href="info_recette.php #<?php echo $recettes['id_recette'];?>"><?php echo $recettes['nom_recette'];?></a></td>
                     <td><?php echo $recettes['temps_preparation']."Min";?></td>
                     <td><?php echo $recettes['nom_categorie'];?></td>
                     <?php endforeach;?>
